@@ -1,0 +1,12 @@
+<!DOCTYPE html><html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Document Verification - RPIC School</title><link rel="stylesheet" href="/css/app.css"></head>
+<body><div class="topbar"><div class="t"><h1>RPIC SCHOOL</h1><small>Document Verification</small></div></div>
+<div class="container"><div class="card" id="res"><p class="muted">Verifying...</p></div></div>
+<script>
+const id = new URLSearchParams(location.search).get('doc') || location.pathname.split('/').pop();
+fetch('/api/verify/' + id).then(r => r.json()).then(d => {
+  const el = document.getElementById('res');
+  if (!d.valid) { el.innerHTML = '<p class="pill bad">INVALID</p><p class="muted" style="margin-top:8px">Yeh document verify nahi hua.</p>'; return; }
+  el.innerHTML = '<span class="pill ok">VERIFIED</span>' + Object.entries(d).filter(([k]) => k !== 'valid').map(([k, v]) => `<div class="row" style="margin-top:8px"><b style="width:130px;font-size:13px">${k.replace(/_/g, ' ')}</b><span style="font-size:14px">${v == null ? '-' : v}</span></div>`).join('');
+});
+</script></body></html>

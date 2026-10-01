@@ -1,0 +1,27 @@
+{
+  "name": "rpic-school-class10-studyhub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RPIC SCHOOL - CLASS 10 STUDY HUB (UP Board 2026-27) - Developed by Divyansh Singh",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "nanoid": "^3.3.7",
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^1.1.1",
+    "qrcode": "^1.5.4",
+    "razorpay": "^2.9.4",
+    "sharp": "^0.33.5",
+    "tesseract.js": "^7.0.0"
+  }
+}
