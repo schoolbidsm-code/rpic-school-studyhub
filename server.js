@@ -18,6 +18,7 @@ app.use(require('./src/routes/verify'));
 app.use(require('./src/routes/payments'));
 app.use(require('./src/routes/requests'));
 app.use(require('./src/routes/system'));
+app.use(require('./src/routes/features'));
 app.use(require('./src/routes/admin'));
 
 // Ask RPIC AI: floating assistant (Hindi/English/Hinglish). Needs OPENAI-compatible key or fallback notice.

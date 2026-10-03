@@ -100,6 +100,15 @@ async function vDashboard() {
       <button class="btn sec" onclick="location.hash='#payments'">💳 Payments</button>
       <button class="btn sec" onclick="location.hash='#progress'">📊 Progress Report</button>
     </div>
+    <h2 class="sec">Study Tools</h2>
+    <div class="grid2">
+      <button class="btn sec" onclick="location.hash='#sets'">📄 7-Set Papers</button>
+      <button class="btn sec" onclick="location.hash='#random'">🔀 Random Test</button>
+      <button class="btn sec" onclick="location.hash='#pdfai'">✨ PDF AI</button>
+      <button class="btn sec" onclick="location.hash='#pyq'">🔎 PYQ Search</button>
+      <button class="btn sec" onclick="location.hash='#formulas'">∑ Formulas</button>
+      <button class="btn sec" onclick="location.hash='#ai'">🤖 Ask RPIC AI</button>
+    </div>
   </div>`;
   tickCountdowns();
 }
@@ -528,8 +537,107 @@ window.aiClear = () => { localStorage.removeItem(AI_HIST_KEY); route().then(hide
 window.aiSuggest = (b) => { document.getElementById('aiin').value = b.textContent; document.getElementById('aisend').click(); };
 window.aiStop = () => { if (window.aiCtl) window.aiCtl.abort(); };
 
+// ---------- 7-SET PAPERS ----------
+async function vSets() {
+  const d = await api('/api/sets');
+  root.innerHTML = topbar('OFFICIAL 7-SET PAPERS') + `<div class="container">
+    <div class="card"><b>Official 7-Set Papers</b>
+    <p class="muted">Board paper sets (824-DA to 824-DG) ke hisaab se banaye gaye sets. Admin jab set ke questions add karega, wahi yahan aayenge.</p></div>
+    ${d.sets.length ? d.sets.map(x => `
+      <div class="card"><div class="row"><div style="flex:1"><b>${esc(x.set_no)}</b><br><small class="muted">${x.c} questions${x.subj ? ' · ' + esc(x.subj) : ''}</small></div>
+      <button class="btn" style="width:auto;padding:9px 16px;margin:0" onclick="startSet('${esc(x.set_no)}')">Start Set</button></div></div>`).join('')
+    : '<div class="card muted">Abhi koi set nahi bana. Admin panel me questions ko set_no (824-DA...824-DG) deke add karein, phir yahan sets khud ban jayenge.</div>'}
+  </div>`;
+}
+window.startSet = async (setNo) => {
+  try { const d = await api('/api/sets/' + encodeURIComponent(setNo) + '/start', { method: 'POST', body: '{}' });
+    CURRENT_TEST = d.test; location.hash = '#test';
+  } catch (e) { toast(e.message); }
+};
+
+// ---------- CUSTOM RANDOM TEST ----------
+function vRandom() {
+  root.innerHTML = topbar('CUSTOM RANDOM PRACTICE') + `<div class="container">
+    <div class="card"><b>Custom Random Practice Generator</b>
+    <p class="muted">Apni marzi ka mock paper banayein: subject chunein aur question count.</p>
+    <label>Subject</label>
+    <select id="rsub"><option value="">All Subjects</option>${['Hindi','English','Mathematics','Science','Social Science','Computer'].map(x => `<option>${x}</option>`).join('')}</select>
+    <label>Questions</label>
+    <select id="rcnt">${[20,30,40,50,75,100].map(n => `<option ${n===20?'selected':''}>${n}</option>`).join('')}</select>
+    <button class="btn" id="rstart">CONFIGURE & LAUNCH RANDOM TEST &rarr;</button></div>
+  </div>`;
+  document.getElementById('rstart').onclick = async () => {
+    try { const d = await api('/api/tests', { method: 'POST', body: JSON.stringify({
+      subject: document.getElementById('rsub').value || null, count: document.getElementById('rcnt').value, mode: 'random' }) });
+      CURRENT_TEST = d.test; location.hash = '#test';
+    } catch (e) { toast(e.message); }
+  };
+}
+
+// ---------- PYQ SEARCH ----------
+async function vPYQ() {
+  root.innerHTML = topbar('PYQ SEARCH') + `<div class="container">
+    <div class="card"><b>Previous Year Questions</b>
+    <p class="muted">Admin/OCR import se saal mark kiye gaye questions search karein.</p>
+    <div class="row"><input id="pyqin" placeholder="jaise: light, quadratic, 2025..."><button class="btn" style="width:auto;padding:11px 16px;margin:0" id="pyqgo">Search</button></div></div>
+    <div id="pyqout"></div>
+  </div>`;
+  const go = async () => {
+    const q = document.getElementById('pyqin').value.trim();
+    if (!q) return;
+    const d = await api('/api/pyq?q=' + encodeURIComponent(q));
+    document.getElementById('pyqout').innerHTML = d.questions.length ? d.questions.map(x => `
+      <div class="card"><span class="pill ok">${esc(x.year || 'PYQ')}</span> <span class="muted">${esc(x.subject || '')}${x.chapter ? ' · ' + esc(x.chapter) : ''}</span>
+      <p style="margin:8px 0">${esc(x.question)}</p>
+      ${(x.options || []).map(o => `<div class="qopt">${esc(o)}</div>`).join('')}</div>`).join('')
+    : '<div class="card muted">Is search ke liye koi PYQ nahi mila. Admin PYQ questions add karein.</div>';
+  };
+  document.getElementById('pyqgo').onclick = go;
+  document.getElementById('pyqin').onkeydown = (e) => { if (e.key === 'Enter') go(); };
+}
+
+// ---------- FORMULAS ----------
+async function vFormulas() {
+  const d = await api('/api/formulas');
+  root.innerHTML = topbar('FORMULAS') + `<div class="container">
+    <div class="card"><b>Science & Math Formulae</b><p class="muted">Board exam se pehle last-minute revision ke liye.</p></div>
+    ${d.groups.map(g => `
+      <details class="card" style="cursor:pointer"><summary style="font-weight:800;color:var(--brand)">${esc(g.group)}</summary>
+      ${g.items.map(i => `<p style="margin:10px 0 2px"><b>${esc(i[0])}</b><br><span class="muted">${esc(i[1])}</span></p>`).join('')}
+      </details>`).join('')}
+  </div>`;
+}
+
+// ---------- PDF AI ----------
+function vPDFAI() {
+  root.innerHTML = topbar('PDF QUESTION AI') + `<div class="container">
+    <div class="card"><b>PDF-Based Board Question System</b>
+    <p class="muted">Koi bhi question paper, notes ya syllabus ka text paste karein. AI usse naye practice questions banayega (direct copies nahi).</p>
+    <label>Source Syllabus / PDF Content</label>
+    <textarea id="aipdf" rows="6" placeholder="Paste syllabus text, chapter notes, previous year question paper content..."></textarea>
+    <label>Target Subject</label>
+    <select id="aisub">${['Science','Mathematics','Social Science','Hindi','English','Computer'].map(x => `<option>${x}</option>`).join('')}</select>
+    <label>Questions to Generate</label>
+    <select id="aicnt">${[5,10,15,20].map(n => `<option ${n===10?'selected':''}>${n}</option>`).join('')}</select>
+    <button class="btn" id="aigen">GENERATE TEST &rarr;</button></div>
+    <div id="aiout"></div>
+  </div>`;
+  document.getElementById('aigen').onclick = async () => {
+    try {
+      const d = await api('/api/ai/questions', { method: 'POST', body: JSON.stringify({
+        text: document.getElementById('aipdf').value, subject: document.getElementById('aisub').value, count: document.getElementById('aicnt').value }) });
+      if (!d.ok) { document.getElementById('aiout').innerHTML = '<div class="card muted">' + esc(d.notice || 'AI abhi configure nahi hai.') + '</div>'; return; }
+      document.getElementById('aiout').innerHTML = d.questions.length ? d.questions.map((x, i) => `
+        <div class="card"><b>Q${i + 1}.</b> ${esc(x.question)}<br>${(x.options || []).map(o => `<div class="qopt">${esc(o)}</div>`).join('')}
+        ${x.answer ? '<small class="muted">Answer: ' + esc(x.answer) + '</small>' : ''}</div>`).join('')
+      : '<div class="card muted">AI se questions nahi ban paye, dobara koshish karein.</div>';
+    } catch (e) { toast(e.message); }
+  };
+}
+
+
 // ---------- ROUTER ----------
-const VIEWS = { dashboard: vDashboard, study: vStudy, tests: vTests, test: vTest, result: vResult, progress: vProgress, certificates: vCertificates, store: vStore, payments: vPayments, orders: vOrders, profile: vProfile, requests: vRequests, notifications: vNotifications, ai: vAI };
+const VIEWS = { dashboard: vDashboard, study: vStudy, tests: vTests, test: vTest, result: vResult, progress: vProgress, certificates: vCertificates, store: vStore, payments: vPayments, orders: vOrders, profile: vProfile, requests: vRequests, notifications: vNotifications, ai: vAI, sets: vSets, random: vRandom, pyq: vPYQ, formulas: vFormulas, pdfai: vPDFAI };
 async function route() {
   const h = (location.hash || '#dashboard').slice(1);
   if (!STUDENT) {
