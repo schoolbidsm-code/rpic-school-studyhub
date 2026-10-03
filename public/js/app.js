@@ -20,25 +20,29 @@ function toast(msg) {
 function loginScreen() {
   nav.style.display = 'none'; fab.style.display = 'none';
   root.innerHTML = `
-  <div class="topbar"><img src="/img/school-logo.jpg" alt="RPIC" style="height:40px;width:40px;border-radius:10px;background:#fff"><div class="t"><h1>RPIC SCHOOL</h1><small>CLASS 10 STUDY HUB · UP BOARD · 2026-27</small></div></div>
-  <div class="container" style="padding-top:40px">
-    <div class="card" style="text-align:center">
-      <img src="/img/school-logo.jpg" alt="RPIC School logo" style="width:110px;height:110px;object-fit:contain">
-      <h1 style="font-size:20px;margin:8px 0">RPIC SCHOOL</h1>
-      <p class="muted">CLASS 10 STUDY HUB<br>UP BOARD · 2026-27<br>Developed by Divyansh Singh</p>
+  <div class="container">
+    <div class="login-hero">
+      <img src="/img/school-logo.jpg" alt="RPIC School logo">
+      <h1>RPIC STUDY HUB</h1>
+      <div class="tag">CLASS 10 BOARD EXAM PREPARATION PORTAL</div>
+      <p class="muted" style="margin-top:6px"><span class="chip">UP BOARD &bull; 2026&ndash;27</span></p>
     </div>
+    <div class="pullhint">PRESS &amp; PULL CARD UP (कार्ड खींचें) &nbsp;⌃⌄</div>
     <div class="card">
-      <label>Mobile Number</label>
-      <input id="mob" type="tel" maxlength="10" placeholder="10 digit mobile number">
-      <button class="btn" id="sendOtp">Send OTP</button>
+      <label>Student Full Name</label>
+      <input id="nm" placeholder="Enter student name (e.g. Divyansh Singh)">
+      <label>Mobile / WhatsApp Number</label>
+      <div class="plus91"><span class="pfx">+91</span><input id="mob" type="tel" maxlength="10" placeholder="Enter 10-digit phone number"></div>
+      <p class="muted" style="font-size:11px">Used for your student profile, mock test reports, and offline access.</p>
+      <button class="btn" id="sendOtp">START STUDYING &rarr;</button>
       <div id="step2" style="display:none">
         <label>OTP</label><input id="otp" type="number" maxlength="6" placeholder="6 digit OTP">
-        <input id="nm" placeholder="Aapka naam (naye students ke liye)">
-        <button class="btn" id="doLogin">Login</button>
+        <button class="btn" id="doLogin">VERIFY &amp; START &rarr;</button>
       </div>
       <p class="muted" id="otpNote"></p>
+      <p style="text-align:center;margin-top:4px"><span class="badge-off">⚡ Offline Ready &nbsp;·&nbsp; <a href="/admin.html" style="color:var(--brand)">Admin Login</a></span></p>
     </div>
-    <div class="card"><a href="/admin.html" style="color:var(--brand);font-size:13px">Admin Login</a></div>
+    <p class="muted" style="text-align:center;font-size:11px">Developed by <b style="color:var(--brand)">Divyansh Singh</b> &middot; RPIC School, Siswa Bazar&ndash;Maharajganj (U.P.)</p>
   </div>`;
   document.getElementById('sendOtp').onclick = async () => {
     try {
@@ -54,7 +58,7 @@ function loginScreen() {
         mobile: document.getElementById('mob').value.trim(),
         code: document.getElementById('otp').value.trim(),
         name: document.getElementById('nm').value.trim() }) });
-      STUDENT = d.student; route();
+      STUDENT = d.student; route().then(hideSplash).catch(hideSplash);
     } catch (e) { toast(e.message); }
   };
 }
@@ -338,7 +342,7 @@ window.buy = async (productId) => {
               razorpay_payment_id: resp.razorpay_payment_id, razorpay_signature: resp.razorpay_signature }) });
             if (v.status === 'PAID') toast('Payment verified. PDF unlocked. Access code: ' + v.access_code);
             else if (v.status === 'PROCESSING') toast(v.notice);
-            route();
+            route().then(hideSplash).catch(hideSplash);
           } catch (e) { toast(e.message); }
         },
         modal: { ondismiss: () => toast('Payment cancel ho gaya') }
@@ -379,7 +383,7 @@ async function vOrders() {
       const r = await api('/api/documents/id-card/order', { method: 'POST', body: JSON.stringify({
         name: document.getElementById('onm').value, mobile: document.getElementById('omb').value,
         address: document.getElementById('oad').value, required_date: document.getElementById('odt').value }) });
-      toast('Order placed: ' + r.order_no + '. Payment admin confirm karega.'); route();
+      toast('Order placed: ' + r.order_no + '. Payment admin confirm karega.'); route().then(hideSplash).catch(hideSplash);
     } catch (e) { toast(e.message); }
   };
 }
@@ -402,7 +406,7 @@ async function vProfile() {
       await api('/api/student/profile', { method: 'PUT', body: JSON.stringify({ name: document.getElementById('pnm').value, roll_no: document.getElementById('prn').value }) });
       const f = document.getElementById('pph').files[0];
       if (f) { const fd = new FormData(); fd.append('photo', f); await fetch('/api/student/photo', { method: 'POST', body: fd }); }
-      toast('Profile save ho gayi'); route();
+      toast('Profile save ho gayi'); route().then(hideSplash).catch(hideSplash);
     } catch (e) { toast(e.message); }
   };
   document.getElementById('logout').onclick = async (e) => {
@@ -437,7 +441,7 @@ async function vRequests() {
   document.getElementById('rsend').onclick = async () => {
     try {
       const r = await api('/api/requests', { method: 'POST', body: JSON.stringify({ subject: document.getElementById('rsub').value, product_id: document.getElementById('rprod').value || null, message: document.getElementById('rmsg').value }) });
-      toast('Request bhej di gayi: ' + r.request_no); route();
+      toast('Request bhej di gayi: ' + r.request_no); route().then(hideSplash).catch(hideSplash);
     } catch (e) { toast(e.message); }
   };
 }
@@ -457,7 +461,7 @@ window.payReq = async (no) => {
               razorpay_payment_id: resp.razorpay_payment_id, razorpay_signature: resp.razorpay_signature }) });
             if (v.status === 'PAID') toast('Payment verified. Request PAID ho gayi.');
             else if (v.status === 'PROCESSING') toast(v.notice);
-            route();
+            route().then(hideSplash).catch(hideSplash);
           } catch (e) { toast(e.message); }
         },
         modal: { ondismiss: () => toast('Payment cancel ho gaya') }
@@ -520,7 +524,7 @@ async function vAI() {
   document.getElementById('aisend').onclick = send;
   document.getElementById('aiin').onkeydown = (e) => { if (e.key === 'Enter') send(); };
 }
-window.aiClear = () => { localStorage.removeItem(AI_HIST_KEY); route(); };
+window.aiClear = () => { localStorage.removeItem(AI_HIST_KEY); route().then(hideSplash).catch(hideSplash); };
 window.aiSuggest = (b) => { document.getElementById('aiin').value = b.textContent; document.getElementById('aisend').click(); };
 window.aiStop = () => { if (window.aiCtl) window.aiCtl.abort(); };
 
@@ -536,7 +540,8 @@ async function route() {
   const v = VIEWS[h] || vDashboard;
   try { await v(); } catch (e) { if (String(e.message).includes('Login')) { STUDENT = null; loginScreen(); } else toast(e.message); }
 }
-window.addEventListener('hashchange', route);
+function hideSplash(){ clearTimeout(window.__splashTimer); var sp=document.getElementById('splash'); if(sp) sp.classList.add('hide'); }
+window.addEventListener('hashchange', hideSplash);
 fab.onclick = () => { location.hash = '#ai'; };
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
-route();
+route().then(hideSplash).catch(hideSplash);

@@ -1,10 +1,21 @@
-<!DOCTYPE html><html lang="hi"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#1a3c8f">
+<!DOCTYPE html>
+<html lang="hi"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a1128">
 <link rel="manifest" href="/manifest.json">
 <title>RPIC SCHOOL - CLASS 10 STUDY HUB</title>
 <link rel="stylesheet" href="/css/app.css">
 </head><body>
+<div id="splash">
+  <img src="/img/school-logo.jpg" alt="RPIC School logo">
+  <h1>RPIC SCHOOL</h1>
+  <div class="sub">CLASS 10 STUDY HUB</div>
+  <div class="chip">UP BOARD &bull; 2026&ndash;27</div>
+  <div class="bar"><i></i></div>
+  <div class="status" id="splashStatus">Initializing board syllabus...</div>
+  <div class="dev">DEVELOPED BY <b>DIVYANSH SINGH</b></div>
+</div>
 <div id="root"></div>
 <div class="nav" id="nav" style="display:none">
   <a href="#dashboard" data-r="dashboard"><span class="ic">🏠</span>HOME</a>
@@ -15,5 +26,12 @@
   <a href="#profile" data-r="profile"><span class="ic">👤</span>PROFILE</a>
 </div>
 <button class="fab" id="fab" style="display:none">Ask RPIC AI</button>
+<script>
+(function(){
+  var msgs=['Initializing board syllabus...','Loading chapters & papers...','Preparing your hub...'];
+  var i=0; var t=setInterval(function(){ i=(i+1)%msgs.length; var el=document.getElementById('splashStatus'); if(el) el.textContent=msgs[i]; },520);
+  window.__splashTimer=setTimeout(function(){ clearInterval(t); var s=document.getElementById('splash'); if(s) s.classList.add('hide'); },2600);
+})();
+</script>
 <script src="/js/app.js"></script>
 </body></html>
