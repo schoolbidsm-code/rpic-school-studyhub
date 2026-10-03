@@ -19,7 +19,7 @@ router.post('/api/auth/send-otp', async (req, res) => {
     }
     const code = issueOtp(m);
     const out = await sendOtpSms(m, code);
-    res.json({ ok: true, new_user: isNew, otp_sent: out.sent, dev_notice: out.dev ? 'OTP server log me gaya hai (SMS provider configured nahi hai). Production ke liye OTP provider set karein.' : null });
+    res.json({ ok: true, new_user: isNew, otp_sent: out.sent, dev_otp: out.dev ? code : null, dev_notice: out.dev ? 'Demo mode: SMS provider configured nahi hai, OTP screen par dikh raha hai.' : null });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

@@ -18,7 +18,7 @@ function otpProviderConfigured() {
 async function sendOtpSms(mobile, code) {
   if (!otpProviderConfigured()) {
     console.log(`[OTP DEV MODE - no provider configured] OTP for ${mobile}: ${code}`);
-    return { sent: false, dev: true };
+    return { sent: false, dev: true, code };
   }
   if (process.env.OTP_PROVIDER === 'msg91') {
     const url = `https://control.msg91.com/api/v5/flow/`;

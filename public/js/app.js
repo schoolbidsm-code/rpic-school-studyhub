@@ -45,7 +45,7 @@ function loginScreen() {
       const mob = document.getElementById('mob').value.trim();
       const d = await api('/api/auth/send-otp', { method: 'POST', body: JSON.stringify({ mobile: mob }) });
       document.getElementById('step2').style.display = 'block';
-      document.getElementById('otpNote').textContent = d.otp_sent ? 'OTP bhej diya gaya hai.' : (d.dev_notice || 'OTP server log me hai (SMS provider configure nahi hai).');
+      document.getElementById('otpNote').textContent = d.otp_sent ? 'OTP bhej diya gaya hai aapke mobile par.' : (d.dev_otp ? ('Demo mode (SMS provider abhi configured nahi hai). Aapka OTP hai: ' + d.dev_otp) : (d.dev_notice || 'OTP server log me hai (SMS provider configure nahi hai).'));
     } catch (e) { toast(e.message); }
   };
   document.getElementById('doLogin').onclick = async () => {
