@@ -20,10 +20,10 @@ function toast(msg) {
 function loginScreen() {
   nav.style.display = 'none'; fab.style.display = 'none';
   root.innerHTML = `
-  <div class="topbar"><div class="t"><h1>RPIC SCHOOL</h1><small>CLASS 10 STUDY HUB · UP BOARD · 2026-27</small></div></div>
+  <div class="topbar"><img src="/img/school-logo.jpg" alt="RPIC" style="height:40px;width:40px;border-radius:10px;background:#fff"><div class="t"><h1>RPIC SCHOOL</h1><small>CLASS 10 STUDY HUB · UP BOARD · 2026-27</small></div></div>
   <div class="container" style="padding-top:40px">
     <div class="card" style="text-align:center">
-      <div style="font-size:44px">🎓</div>
+      <img src="/img/school-logo.jpg" alt="RPIC School logo" style="width:110px;height:110px;object-fit:contain">
       <h1 style="font-size:20px;margin:8px 0">RPIC SCHOOL</h1>
       <p class="muted">CLASS 10 STUDY HUB<br>UP BOARD · 2026-27<br>Developed by Divyansh Singh</p>
     </div>
@@ -64,7 +64,7 @@ async function vDashboard() {
   const [p, exams] = await Promise.all([api('/api/progress'), api('/api/exams')]);
   const pr = p.progress;
   root.innerHTML = `
-  <div class="topbar"><div class="t"><h1>RPIC SCHOOL</h1><small>CLASS 10 STUDY HUB · UP BOARD · 2026-27</small></div></div>
+  <div class="topbar"><img src="/img/school-logo.jpg" alt="RPIC" style="height:40px;width:40px;border-radius:10px;background:#fff"><div class="t"><h1>RPIC SCHOOL</h1><small>CLASS 10 STUDY HUB · UP BOARD · 2026-27</small></div></div>
   <div class="container">
     <div class="card"><div class="row"><div>
       <b style="font-size:17px">${esc(STUDENT.name)}</b><br><small class="muted">${esc(STUDENT.student_code)} · Class ${esc(STUDENT.class || '10')}</small>
@@ -273,7 +273,7 @@ async function vProgress() {
 
 // ---------- CERTIFICATES + ID CARD ----------
 function topbar(title) {
-  return `<div class="topbar"><div class="t"><h1>RPIC SCHOOL</h1><small>${esc(title)} · UP BOARD · 2026-27</small></div></div>`;
+  return `<div class="topbar"><img src="/img/school-logo.jpg" alt="RPIC" style="height:40px;width:40px;border-radius:10px;background:#fff"><div class="t"><h1>RPIC SCHOOL</h1><small>${esc(title)} · UP BOARD · 2026-27</small></div></div>`;
 }
 
 async function vCertificates() {
